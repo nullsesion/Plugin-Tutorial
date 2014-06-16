@@ -105,7 +105,7 @@ ruby script/rails console
 >> Poll.create(:question => "And can you see this other poll")
 >> exit
 </pre>
-Отредактируйте plugins/polls/app/models/poll.rb в вашей директории плагинов и добавте метод vote который будет вызыватся из нашего контролера:
+Отредактируйте plugins/polls/app/models/poll.rb добавте метод vote который будет вызыватся из нашего контролера:
 <pre>
 class Poll &lt; ActiveRecord::Base
   def vote(answer)
