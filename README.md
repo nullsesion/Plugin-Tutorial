@@ -64,7 +64,7 @@ end
 Сейчас плагин не может сохронять никакую информацию. Давайте создадим простую модель опроса(Poll) для нашего плагина.
 Для создания модели используйте следующий синтаксис:
 <pre>
-ruby script/rails generate redmine_plugin_model <plugin_name> <model_name> [field[:type][:index] field[:type][:index] ...]
+ruby script/rails generate redmine_plugin_model &lt;plugin_name&gt &lt;model_name&gt; [field[:type][:index] field[:type][:index] ...]
 </pre>
 выполним команду в командной строке
 <pre>
@@ -75,7 +75,7 @@ $ ruby script/rails generate redmine_plugin_model polls poll question:string yes
 </pre>
 Это действие создаст модель Poll и соответствующий файл миграции  file 001_create_polls.rb в plugins/polls/db/migrate:
 <pre>
-class CreatePolls < ActiveRecord::Migration
+class CreatePolls &lt; ActiveRecord::Migration
   def change
     create_table :polls do |t|
       t.string :question
@@ -107,7 +107,7 @@ ruby script/rails console
 </pre>
 Отредактируйте plugins/polls/app/models/poll.rb в вашей директории плагинов и добавте метод vote который будет вызыватся из нашего контролера:
 <pre>
-class Poll < ActiveRecord::Base
+class Poll &lt; ActiveRecord::Base
   def vote(answer)
     increment(answer == 'yes' ? :yes : :no)
   end
