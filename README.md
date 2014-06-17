@@ -225,3 +225,83 @@ end
 ![http://www.redmine.org/attachments/download/854/application_menu.png](http://www.redmine.org/attachments/download/854/application_menu.png)
 
 Теперь вы можете получить доступ к опросам, нажав на вкладке Polls с экрана приветствия.
+
+####Расширение меню проекта
+
+Теперь, давайте рассмотрим, случай когда необходимо чтобы опросы задавались на уровне проекта (даже если это не так, в нашем примере).Мы хотели бы добавить Вкладку Polls в меню проекта, а не в меню приложения
+Откройте init.rb и замените строку, которую мы добавляли ранее ( menu :application_menu, :polls, { :controller => 'polls', :action => 'index' }, :caption => 'Polls')
+на следующие две
+<pre>
+Redmine::Plugin.register :redmine_polls do
+  [...]
+
+  permission :polls, { :polls => [:index, :vote] }, :public => true
+  menu :project_menu, :polls, { :controller => 'polls', :action => 'index' }, :caption => 'Polls', :after => :activity, :param => :project_id
+end
+</pre>
+
+Вторая строка добавляет наши опросы вкладки в меню проэкта, сразу после вкладки activity. Первая строка необходима и заявляет, что наши два метода из PollsController являются публичными. Мы вернемся позже, чтобы объяснить это более подробно. Перезапустить приложение и перейдите к одному из ваших проектов:
+![http://www.redmine.org/attachments/download/3773/project_menu.png](http://www.redmine.org/attachments/download/3773/project_menu.png)
+
+Если вы щелкните на вкладке Polls(в 3-й позиции), то вы должны заметить, что меню проекта не отображается.
+Чтобы сделать проект меню видимой, вы должны инициализировать в контроллере инстансную переменную проекта (@project)
+
+Для этого отредактируйте PollsController следующим образом
+<pre>
+def index
+  @project = Project.find(params[:project_id])
+  @polls = Poll.find(:all) # @project.polls
+end
+</pre>
+
+id проекта доступна в param[:project_id] 
+Теперь вы должны увидеть меню проекта находясь на вкладке Polls
+![http://www.redmine.org/attachments/download/3774/project_menu_pools.png](http://www.redmine.org/attachments/download/3774/project_menu_pools.png)
+
+###Добавление новых прав
+
+Сейчас любой желающий может проголосовать и посмотреть опросы. Давайте сделаем ее более гибкую настройку прав
+Мы собираемся создать2 разрешения : одно для просмотра опросы и другая для голосования. Эти разрешения не публичные(опция :public => true удаляется).
+отредаетируйте plugins/polls/init.rb и замените строчку с permission на две следующих
+<pre>
+  permission :view_polls, :polls => :index
+  permission :vote_polls, :polls => :vote
+</pre>
+Перезапустите redmine и перейдите [http://localhost:3000/roles/permissions:](http://localhost:3000/roles/permissions)
+![http://www.redmine.org/attachments/download/858/permissions1.png](http://www.redmine.org/attachments/download/858/permissions1.png)
+Теперь вы настраивать эти два разрешения для существующих ролей.
+Конечно, небходимо добавить код в PollsController который сделает эту зашиту фактической в соответствии привилегиями текущего пользователя.
+Для этого нам всего лишь нужно добавить :authorize filter и сделать получение инстансной переменной @project возможной только после отработки данного фильтра
+Вот как это будет выглядеть для метода #index.
+<pre>
+class PollsController < ApplicationController
+  unloadable
+
+  before_filter :find_project, :authorize, :only => :index
+
+  [...]
+
+  def index
+    @polls = Poll.find(:all) # @project.polls
+  end
+
+  [...]
+
+  private
+
+  def find_project
+    # @project variable must be set before calling the authorize filter
+    @project = Project.find(params[:project_id])
+  end
+end
+</pre>
+Для метода vote данная проверка прав может быть сделана по аналогии
+После этого поросмотр опросов и возможность голосовать будет доступна только админам и пользователям для ролей которых выставленны соответствующие разрешения
+Перезапустите redmine и укажите необходимые права
+
+####Создание модуля проекта
+
+Теперь функции опроса доступны для всех ваших проектов.Но вы хотите иметь возможность включать ее только для некторых проектов
+
+
+
