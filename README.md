@@ -113,3 +113,67 @@ class Poll &lt; ActiveRecord::Base
   end
 end
 </pre>
+
+###Генерация контролера
+
+Сейчас плагин ничего не делает. Поэтому давайте создадим контроллер для него.
+Мы будем использовать генератор контролера для плагинов redmine. Со следующим синтаксисом:
+
+<pre>
+ruby script/rails generate redmine_plugin_controller &lt;plugin_name&gt; &lt;controller_name&gt; [&lt;actions&gt;]
+</pre>
+
+Выполните эту команду в консоле
+<pre>
+$ ruby script/rails generate redmine_plugin_controller Polls polls index vote
+      create  plugins/polls/app/controllers/polls_controller.rb
+      create  plugins/polls/app/helpers/polls_helper.rb
+      create  plugins/polls/test/functional/polls_controller_test.rb
+      create  plugins/polls/app/views/polls/index.html.erb
+      create  plugins/polls/app/views/polls/vote.html.erb
+</pre>
+Это создаст контролер с двумя методами(actions)(#index и #vote).
+Отредактируйте файл plugins/polls/app/controllers/polls_controller.rb и внесите в два этих метода код необходимый для их работы
+<pre>
+class PollsController < ApplicationController
+  unloadable
+
+  def index
+    @polls = Poll.all
+  end
+
+  def vote
+    poll = Poll.find(params[:id])
+    poll.vote(params[:answer])
+    if poll.save
+      flash[:notice] = 'Vote saved.'
+    end
+    redirect_to :action => 'index'
+  end
+end
+</pre>
+Затем отредактируйте plugins/polls/app/views/polls/index.html.erb, который будет отображать существующие опросы:
+<pre>
+&lt;h2&gt;Polls&lt;/h2&gt;
+
+&lt;% @polls.each do |poll| %&gt;
+  &lt;p&gt;
+  &lt;%= poll.question %&gt;?
+  &lt;%= link_to 'Yes', { :action => 'vote', :id => poll[:id], :answer => 'yes' }, :method => :post %&gt; (&lt;%= poll.yes %&gt;) /
+  &lt;%= link_to 'No', { :action => 'vote', :id => poll[:id], :answer => 'no' }, :method => :post %&gt; (&lt;%= poll.no %&gt;)
+  &lt;/p&gt;
+&lt;% end %&gt;
+</pre>
+Вы можете удалить плагины/polls/app/views/polls/vote.html.erb поскольку визуализация данного файла выполнятся не будет.
+
+####Добавление Роутинга(маршруты) 
+Redmine не поддерживает подстановки по умолчанию маршрут (':controller/:action/:id').
+Плагины должны декларировать маршруты, по которым они нуждаются в файле config/routes.rb.
+Теперь отредактируйте plugins/polls/config/routes.rb и добавте в него 2 маршрута для двух действий
+<pre>
+get 'polls', :to => 'polls#index'
+post 'post/:id/vote', :to => 'polls#vote'
+</pre>
+вы можете найти больше информации о Роутинге в Rails сдесь [http://guides.rubyonrails.org/routing.html](http://guides.rubyonrails.org/routing.html)
+Теперь перезапустите ваше приложение и зайдите в браузере на страницу [http://localhost:3000/polls.](http://localhost:3000/polls)
+Вы должны увидеть 2 опроса и сможете проголосовать:
