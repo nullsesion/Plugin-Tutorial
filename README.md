@@ -177,4 +177,7 @@ post 'post/:id/vote', :to => 'polls#vote'
 вы можете найти больше информации о Роутинге в Rails сдесь [http://guides.rubyonrails.org/routing.html](http://guides.rubyonrails.org/routing.html)
 Теперь перезапустите ваше приложение и зайдите в браузере на страницу [http://localhost:3000/polls.](http://localhost:3000/polls)
 Вы должны увидеть 2 опроса и сможете проголосовать:
+<<<<<<< HEAD
 ![Плагин для Redmine](http://www.redmine.org/attachments/download/853/pools1.png)
+=======
+>>>>>>> cd26d73fbd211a63a850ca3d77c6c2499368fcc8
