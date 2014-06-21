@@ -361,3 +361,44 @@ end
 <pre>
   &lt;% html_title "Polls" %  &gt;
 </pre>
+
+###Использование хуков(hooks)
+
+####Хуки в отображении
+Хуки в отображениях в редмайне позволяют вставлять ваш контент в заранее определенные места 
+в шаблонов. для примера посмотите например код представленный по следующей ссылке [http://www.redmine.org/projects/redmine/repository/entry/tags/2.0.0/app/views/projects/show.html.erb#L52](http://www.redmine.org/projects/redmine/repository/entry/tags/2.0.0/app/views/projects/show.html.erb#L52) вы увидете два хука: первый имеет имя :view_projects_show_left и предназначен для вставки контента в левую часть шаблона и второй с именем :view_projects_show_right для вставки контента в правую часть шаблона. 
+
+Чтобы использовать один или несколько хуков в отображениях вы должны создать класс наследуемый от  Redmine::Hook::ViewListener и реализующий методы хуков которые вы желаете использовать. Теперь чтобы выводить контент для определенных хуков на вкладке "обзор" в проектах вам вам необходимом подключить ваш клас в файле init.rb и реализовать методы с именами хуков которые хотите использовать.
+
+Для нашего плагина создайте файл plugins/polls/lib/polls_hook_listener.rb и добавте в него следующий код:
+<pre>
+class PollsHookListener < Redmine::Hook::ViewListener
+  def view_projects_show_left(context = {})
+    return content_tag("p", "Custom content added to the left")
+  end
+
+  def view_projects_show_right(context = {})
+    return content_tag("p", "Custom content added to the right")
+  end
+end
+</pre>
+
+Также добавте строчку в конец файла plugins/polls/init.rb:
+<pre>
+require_dependency 'polls_hook_listener'
+</pre>
+
+Перезапустите Redmine и перейдите на вкладку "обзор" проекта. Где высможете увидить две наших строчки слева и справа. 
+
+Вы также можете использовать хелпер render_on для отображения частичных шаблонов. В нашем плагине замените содержимое файла plugins/polls/lib/polls_hook_listener.rb следующим:
+<pre>
+class PollsHookListener < Redmine::Hook::ViewListener
+  render_on :view_projects_show_left, :partial => "polls/project_overview" 
+end
+</pre>
+
+Добавте частичный шаблон в наш плагин для этого создайте файл app/views/polls/_project_overview.html.erb. Добавте в него контент (Например "Это сообщение выведено с использованием хуков") который будет выведен в левой части вкладки "обзор" на странице проекта. Не забудте перезапустить Redmine.
+
+####Хуки в контролерах
+В работе
+
