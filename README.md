@@ -373,7 +373,7 @@ end
 Для нашего плагина создайте файл plugins/polls/lib/polls_hook_listener.rb и добавте в него следующий код:
 
 <pre>
-class PollsHookListener < Redmine::Hook::ViewListener
+class PollsHookListener &lt; Redmine::Hook::ViewListener
   def view_projects_show_left(context = {})
     return content_tag("p", "Custom content added to the left")
   end
