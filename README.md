@@ -101,9 +101,9 @@ Migrating polls (Polls plugin)...
 <pre>
 ruby script/rails console
 &#91;rails 3&#93; rails console
->> Poll.create(:question => "Can you see this poll")
->> Poll.create(:question => "And can you see this other poll")
->> exit
+&gt;&gt; Poll.create(:question => "Can you see this poll")
+&gt;&gt; Poll.create(:question => "And can you see this other poll")
+&gt;&gt; exit
 </pre>
 Отредактируйте plugins/polls/app/models/poll.rb добавте метод vote который будет вызыватся из нашего контролера:
 <pre>
@@ -371,6 +371,7 @@ end
 Чтобы использовать один или несколько хуков в отображениях вы должны создать класс наследуемый от  Redmine::Hook::ViewListener и реализующий методы хуков которые вы желаете использовать. Теперь чтобы выводить контент для определенных хуков на вкладке "обзор" в проектах вам вам необходимом подключить ваш клас в файле init.rb и реализовать методы с именами хуков которые хотите использовать.
 
 Для нашего плагина создайте файл plugins/polls/lib/polls_hook_listener.rb и добавте в него следующий код:
+
 <pre>
 class PollsHookListener < Redmine::Hook::ViewListener
   def view_projects_show_left(context = {})
