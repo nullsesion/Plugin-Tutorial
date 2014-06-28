@@ -422,16 +422,16 @@ end
 
 При формы с настройками, settings_controller будет принимать в качестве параметра хеш сформированный из вашей формы путем ее сереализации и сохранять в таком виде непосредственно в Setting.plugin_redmine_polls. Каждый раз при отображении страницы с вашими настройками значение Setting.plugin_redmine_polls будет содержать последние сохраненные настройки. 
 <pre> 
-&gt;table&lt;
-  &gt;tbody&lt;
-    &gt;tr&lt;
-      &gt;th&lt;Notification Default Address&gt;/th&lt;
-      &gt;td&lt;&gt;input type="text" id="settings_notification_default" 
-                     value="&gt;%= settings['notification_default'] %&lt;" 
-             name="settings[notification_default]" &lt;
-    &gt;/tr&lt;
-  &gt;/tbody&lt;
-&gt;/table&lt;
+&lt;table&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;th&gt;Notification Default Address&lt;/th&gt;
+      &lt;td&gt;&lt;input type="text" id="settings_notification_default" 
+                     value="&lt;%= settings['notification_default'] %&gt;" 
+             name="settings[notification_default]" &gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
 </pre>  
 В этом примере например для создания элементов формы конфигурации не используются Rails хелперы для форм. Это сделанно по тому что мы не можем принимать параметров вида @settings только хеш. Form helpers будут пытатся получить доступ к атрибутам модели которой не существует. Например обращение к @settings.notification_default окончится неудачей так как его не существует и для обращения к данной опции следует использовать Setting.plugin_redmine_polls['notification_default'].
 
