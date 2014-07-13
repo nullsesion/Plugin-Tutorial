@@ -437,4 +437,63 @@ end
 
 Наконец при указании ключа :default в методе settings при регистрации плагина можно будет указать значение которое будет возвращено Setting.plugin_redmine_polls в случаее если настройки еше не были установленны. 
 
-  
+###Тестирование вашего плагина
+
+####test/test_helper.rb
+Вот содержание моего хелпер файла для тестов
+<pre>
+require File.expand_path(File.dirname(__FILE__) + '/../../../test/test_helper')
+</pre>
+
+####Пример теста
+
+файл polls_controller_test.rb содержит следующий код:
+
+<pre>
+require File.expand_path('../../test_helper', __FILE__)
+
+class PollsControllerTest < ActionController::TestCase
+  fixtures :projects
+
+  def test_index
+    get :index, :project_id => 1
+
+    assert_response :success
+    assert_template 'index'
+  end
+end
+</pre>
+
+####Выполнение теста
+
+Инициализируйте базу данных " test", если это необходимо:
+<pre>
+$ rake db:drop db:create db:migrate redmine:plugins:migrate redmine:load_default_data RAILS_ENV=test
+</pre>
+
+выполните  polls_controller_test.rb
+
+####Тестирование с учетом привелегий
+Если ваш плагин требует наличие пользователя в проекте, то добавьте следующую строку в начале вашего функционального теста:
+<pre>
+def test_index
+  @request.session[:user_id] = 2
+  ...
+end
+</pre>
+
+Если ваш плагин требуется специальное разрешение, необходимо добавить еще роль пользователя, например, так (укажите id ролей, которые подходят для пользователя):
+<pre>
+def test_index
+  Role.find(1).add_permission! :my_permission
+  ...
+end
+</pre>
+
+Вы можете включить/отключить определенней модули следующим образом:
+<pre>
+def test_index
+  Project.find(1).enabled_module_names = [:mymodule]
+  ...
+end
+</pre>
